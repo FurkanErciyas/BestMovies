@@ -1,4 +1,4 @@
-﻿@model BestMovies.Models.Movie
+﻿@model EditMovieViewModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -38,6 +38,20 @@
                 <input asp-for="ImageUrl" class="form-control" />
                 <span asp-validation-for="ImageUrl" class="text-danger"></span>
             </div>
+
+            <div class="form-group">
+                <label class="control-label">Genres</label>
+                @foreach (Genre genre in Model.Genres)
+                {
+                    <div>
+                        <label>
+                            <input type="checkbox" name="SelectedGenres" value="@genre.Id" @(Model.SelectedGenres.Contains(genre.Id) ? "checked" : "") />
+                            @genre.Name
+                        </label>
+                    </div>
+                }
+            </div>
+
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>

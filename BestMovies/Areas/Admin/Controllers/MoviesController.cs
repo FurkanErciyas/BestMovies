@@ -90,12 +90,25 @@ namespace BestMovies.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var movie = await _context.Movies.FindAsync(id);
+            var movie = await _context.Movies.Include(x => x.Genres).FirstOrDefaultAsync(x => x.Id == id.Value);
             if (movie == null)
             {
                 return NotFound();
             }
-            return View(movie);
+
+            var vm = new EditMovieViewModel()
+            {
+                Id = movie.Id,
+                Name = movie.Name,
+                ImageUrl = movie.ImageUrl,
+                ImdbId = movie.ImdbId,
+                Rating = movie.Rating,
+                Year = movie.Year,
+                Genres = await _context.Genres.ToListAsync(),
+                SelectedGenres = movie.Genres.Select(x => x.Id).ToArray()
+            };
+
+            return View(vm);
         }
 
         // POST: Admin/Movies/Edit/5
@@ -103,34 +116,39 @@ namespace BestMovies.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,ImdbId,Name,Year,Rating,ImageUrl")] Movie movie)
+        public async Task<IActionResult> Edit(int? id, [Bind("Id,ImdbId,Name,Year,Rating,ImageUrl")] EditMovieViewModel vm)
         {
-            if (id != movie.Id)
+
+            if (id != vm.Id)
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
-                try
+                var movie = await _context.Movies.Include(x => x.Genres).FirstOrDefaultAsync(x => x.Id == id.Value);
+                if(movie == null)
                 {
-                    _context.Update(movie);
-                    await _context.SaveChangesAsync();
+                    return NotFound();
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!MovieExists(movie.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+
+                movie.Name = vm.Name;
+                movie.ImageUrl = vm.ImageUrl;
+                movie.ImdbId = vm.ImdbId;
+                movie.Rating = vm.Rating.Value;
+                movie.Year = vm.Year.Value;
+                movie.Genres.Clear();
+                var selectedGenres = _context.Genres.Where(x => vm.SelectedGenres.Contains(x.Id));
+                movie.Genres.AddRange(selectedGenres);
+
+                // todo: Veritabanındaki orjinal veriyi çek
+                // üzerindeki alanları güncelle
+                await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
-            return View(movie);
+            vm.Genres = await _context.Genres.ToListAsync();
+            return View(vm);
         }
 
         // GET: Admin/Movies/Delete/5

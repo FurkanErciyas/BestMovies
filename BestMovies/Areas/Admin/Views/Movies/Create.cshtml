@@ -39,15 +39,19 @@
             </div>
             <div class="form-group">
                 <label class="control-label">Genres</label>
-                @foreach (Genre genre in Model.Genres)
-                {
-                    <div>
-                        <label>
-                            <input type="checkbox" name="SelectedGenres" value="@genre.Id" @(Model.SelectedGenres.Contains(genre.Id) ? "checked" : "") />
-                            @genre.Name
-                        </label>
-                    </div>
-                }
+                <div class="checkbox-group border p-2">
+
+                    @foreach (Genre genre in Model.Genres)
+                    {
+                        <div>
+                            <label>
+                                <input type="checkbox" name="SelectedGenres" value="@genre.Id" @(Model.SelectedGenres.Contains(genre.Id) ? "checked" : "") />
+                                @genre.Name
+                            </label>
+                        </div>
+                    }
+                </div>
+
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

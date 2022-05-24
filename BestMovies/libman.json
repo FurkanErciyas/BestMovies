@@ -9,6 +9,11 @@
     {
       "library": "datatables.net-bs4@1.12.0",
       "destination": "wwwroot/lib/datatables.net-bs4/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "font-awesome@6.1.1",
+      "destination": "wwwroot/lib/font-awesome/"
     }
   ]
 }
